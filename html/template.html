@@ -28,6 +28,7 @@
                 body {
                     font-family: -apple-system, sans-serif;
                     background-color: #eeeeee;
+                    padding-top: 72px; /* offset for fixed top navigation */
                 }
 
                 .sidenav {
@@ -51,6 +52,7 @@
 
                 .main {
                     padding-top: 10px;
+                    margin-top: 0; /* ensure content starts below fixed nav */
                 }
 
                 @media screen and (max-height: 450px) {
@@ -92,6 +94,29 @@
                 th, td, tr {
                     text-align:center;
                     vertical-align: middle;
+                }
+
+                /* Top navigation (replacing left sidenav) */
+                .topnav {
+                    position: fixed;
+                    top: 0;
+                    width: 100%;
+                    background-color: #211f1f;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 8px 12px;
+                    z-index: 1000;
+                }
+                .topnav a {
+                    text-decoration: none;
+                    font-size: 16px;
+                    color: #a2a2a2;
+                    padding: 8px 12px;
+                    border-right: none;
+                }
+                .topnav a:hover {
+                    color: white;
                 }
 
                 .loader {
@@ -143,6 +168,32 @@
                   padding-top: 4%;
                   padding-left: 5%;
                   color: dimgrey;
+                  /* prevent long titles from pushing layout */
+                  max-width: 70%;
+                  display: -webkit-box;
+                  -webkit-line-clamp: 2;           /* clamp to two lines */
+                  -webkit-box-orient: vertical;
+                  overflow: hidden;
+                  white-space: normal;
+                  word-break: break-word;
+                }
+
+                /* Top title panel below nav */
+                .title-panel {
+                    margin: 8px 12px 0 12px;
+                }
+                .title-text {
+                    font-size: 1.6rem;
+                    font-weight: 600;
+                    font-family: sans-serif;
+                    color: dimgrey;
+                    max-width: 100%;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                    white-space: normal;
+                    word-break: break-word;
                 }
 
                 .header__date {
@@ -734,28 +785,43 @@
                     background: -ms-linear-gradient(left, #fc6665 %(max_failure_percent)%%,#50597b %(max_failure_percent)%%); /* IE10+ */
                     background: linear-gradient(to right, #fc6665 %(max_failure_percent)%%,#50597b %(max_failure_percent)%%); /* W3C */
                 }
+                /* Reset chart positioning to earlier behavior */
+                .outer_my_chart {
+                    margin-left: 50%;
+                    margin-top: -40%;
+                    max-height: 43%;
+                }
+                .inner_my_chart {
+                    margin-top: 31%;
+                    height: 48%;
+                    margin-left: 16%;
+                    max-width: 75%;
+                }
             </style>
         </head>
     <body>
         <div class="loader"></div>
-        <div class="sidenav">
-            <a onclick="openPage('dashboard', this, '', '', '')" href="#dashboard">
-                <img id="wrimagecard" class="wrimagecard" src="%(custom_logo)%" style="max-width:98%;" />
+        <div class="topnav">
+            <img id="wrimagecard" class="wrimagecard" src="%(custom_logo)%" style="max-height:36px; width:auto;" />
+            <a class="tablink" href="#" id="defaultOpen" onclick="event.preventDefault(); openPage('dashboard', this, 'white', '#565656', 'groove')">
+                <i class="fa fa-home" id="tablinkicon" style="color:currentcolor;"></i> Dashboard
             </a>
-            <a class="tablink" href="#dashboard" id="defaultOpen" onclick="openPage('dashboard', this, 'white', '#565656', 'groove')">
-                <i class="fa fa-home" id="tablinkicon" style="color:currentcolor; margin:5% 5% 5% 10%"></i> Dashboard
+            <a class="tablink" href="#" onclick="event.preventDefault(); openPage('suiteMetrics', this, 'white', '#565656', 'groove'); executeDataTable('#sm',2)">
+                <i class="fa fa-briefcase" id="tablinkicon" style="color:currentcolor;"></i> Suites
             </a>
-            <a class="tablink" href="#suites" onclick="openPage('suiteMetrics', this, 'white', '#565656', 'groove'); executeDataTable('#sm',2)">
-                <i class="fa fa-briefcase" id="tablinkicon" style="color:currentcolor; margin:5% 5% 5% 10%"></i> Suites
+            <a class="tablink" href="#" onclick="event.preventDefault(); openPage('testMetrics', this, 'white', '#565656', 'groove'); executeDataTable('#tm',3)">
+                <i class="fa fa-server" id="tablinkicon" style="color:currentcolor;"></i> Test Metrics
             </a>
-            <a class="tablink" href="#test-metrics" onclick="openPage('testMetrics', this, 'white', '#565656', 'groove'); executeDataTable('#tm',3)">
-                <i class="fa fa-server" id="tablinkicon" style="color:currentcolor; margin:5% 5% 5% 10%"></i> Test Metrics
-            </a>
-            <a class="tablink" href="#screenshots" onclick="openPage('screenshots', this, 'white', '#565656', 'groove');">
-                <i class="fa fa-camera" id="tablinkicon" style="color:currentcolor; margin:5% 5% 5% 10%"></i> Screenshots
+            <a class="tablink" href="#" onclick="event.preventDefault(); openPage('screenshots', this, 'white', '#565656', 'groove');">
+                <i class="fa fa-camera" id="tablinkicon" style="color:currentcolor;"></i> Screenshots
             </a>
         </div>
-        <div class="main col-md-9 ml-sm-auto col-lg-10 px-4" style="height: 100%;">
+        <div class="main col-md-12 px-4" style="height: 100%;">
+            <div class="card title-panel">
+              <div class="card__content">
+                <div class="title-text">%(title)%</div>
+              </div>
+            </div>
             <div class="tabcontent" id="dashboard">
 
                 <div class="row rowcard">
@@ -769,11 +835,6 @@
                             </span>
                           </div>
                           <div>
-                              <div class="card__header">
-                                <div class="header__title">
-                                  %(title)%
-                                </div>
-                              </div>
                               <div class="card__header">
                                 <span class="header__date">%(date)%</span>
                               </div>
@@ -866,12 +927,7 @@
                 </div>
                 <hr/>
 
-                <div class="row">
-                    <div class="col-md-12" style="width:auto;">
-                        <p class="text-muted" style="text-align:center;font-size:9px"> <a href="https://github.com/prashanth-sams/pytest-html-reporter" target="_blank">pytest-html-reporter</a>
-                        </p>
-                    </div>
-                </div>
+                
                 <script>
                     window.onload = function() {
                         alignTotalCount();
@@ -1119,7 +1175,10 @@
                 elmnt.style.borderRight = borderstyle;
             }
             // Get the element with id="defaultOpen" and click on it
+            // Ensure we don't retain scroll from anchor hash; keep at top
+            window.scrollTo(0, 0);
             document.getElementById("defaultOpen").click();
+            window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
         </script>
         <script>
             // Get the element with id="defaultOpen" and click on it

@@ -66,16 +66,7 @@ class HTMLReporter(object):
         if ConfigVars._suite_name is not None: self.append_suite_metrics_row(ConfigVars._suite_name)
 
     def archive_data(self, base, filename):
-        path = os.path.join(base, filename)
-
-        if os.path.isfile(path) is True:
-            os.makedirs(base + '/archive', exist_ok=True)
-            f = 'output.json'
-
-            if isfile(join(base, f)):
-                fname = os.path.splitext(f)
-                os.rename(base + '/' + f, os.path.join(base + '/archive', fname[0] + '_' +
-                                                       str(ConfigVars._start_execution_time) + fname[1]))
+        return
 
     @property
     def report_path(self):
@@ -111,7 +102,6 @@ class HTMLReporter(object):
             path = os.path.join(base, self.report_path[1])
 
             os.makedirs(base, exist_ok=True)
-            self.archive_data(base, self.report_path[1])
 
             # generate json file
             self.generate_json_data(base)
