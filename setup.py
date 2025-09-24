@@ -13,7 +13,7 @@ def read(fname):
 
 setup(
     name="pytest-html-reporter",
-    version="0.3.0",
+    version="0.3.1",
     author="Prashanth Sams",
     author_email="sams.prashanth@gmail.com",
     maintainer="Prashanth Sams",
@@ -31,7 +31,6 @@ setup(
         "Topic :: Software Development :: Testing",
         "Programming Language :: Python",
         "Operating System :: OS Independent",
-        "License :: OSI Approved :: MIT License",
     ],
     entry_points={
         "pytest11": [

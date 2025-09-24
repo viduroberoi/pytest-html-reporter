@@ -1,4 +1,5 @@
 class ConfigVars:
+    _session_start_time = 0
     _total = _executed = 0
     _pass = _fail = 0
     _skip = _error = 0
@@ -62,6 +63,9 @@ class ConfigVars:
     tpass = []
     tfail = []
     tskip = []
+    # durations per test case for duration panel
+    duration_labels = []
+    duration_values = []
     _previous_test_name = ''
     _suite_error = 0
     _suite_fail = 0

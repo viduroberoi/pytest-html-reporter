@@ -77,4 +77,9 @@ def clean_screenshots(path):
 
 
 def custom_title(title):
-    ConfigVars._title = title[:26] + '...' if title.__len__() > 29 else title
+    # For long titles, split into two lines with an ellipsis in between
+    if title.__len__() > 30:
+        mid = int(title.__len__() / 2)
+        ConfigVars._title = title[0:mid] + '...' + '</br>' + title[mid:]
+    else:
+        ConfigVars._title = title

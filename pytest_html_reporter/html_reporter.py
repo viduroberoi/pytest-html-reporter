@@ -9,8 +9,7 @@ from os.path import isfile, join
 
 import pytest
 
-from html_page.archive_body import ArchiveBody
-from html_page.archive_row import ArchiveRow
+## archives removed
 from html_page.floating_error import FloatingError
 from html_page.screenshot_details import ScreenshotDetails
 from html_page.suite_row import SuiteRow
@@ -36,6 +35,15 @@ class HTMLReporter(object):
         _test_end_time = time.time()
         ConfigVars._duration = _test_end_time - ConfigVars._start_execution_time
 
+        # collect duration panel data
+        try:
+            suite_name = ConfigVars._suite_name.split('/')[-1].replace('.py', '') if ConfigVars._suite_name else 'suite'
+        except Exception:
+            suite_name = 'suite'
+        test_label = f"{suite_name}::{ConfigVars._test_name}"
+        ConfigVars.duration_labels.append(test_label)
+        ConfigVars.duration_values.append(round(ConfigVars._duration, 2))
+
         if (self.rerun is not None) and (max_rerun() is not None): self.previous_test_name(ConfigVars._test_name)
         self._test_names(ConfigVars._test_name)
         self.append_test_metrics_row()
@@ -50,6 +58,9 @@ class HTMLReporter(object):
 
     def pytest_runtest_setup(item):
         ConfigVars._start_execution_time = time.time()
+
+    def pytest_sessionstart(self, session):
+        ConfigVars._session_start_time = time.time()
 
     def pytest_sessionfinish(self, session):
         if ConfigVars._suite_name is not None: self.append_suite_metrics_row(ConfigVars._suite_name)
@@ -80,26 +91,14 @@ class HTMLReporter(object):
             return os.path.abspath(logfile), 'pytest_html_report.html'
 
     def remove_old_archives(self):
-        archive_dir = os.path.abspath(os.path.expanduser(os.path.expandvars(self.path))) + '/archive'
-
-        if self.archive_count != '':
-            if int(self.archive_count) == 0:
-                if os.path.isdir(archive_dir):
-                    shutil.rmtree(archive_dir)
-                return
-
-            archive_count = int(self.archive_count) - 1
-            if os.path.isdir(archive_dir):
-                archives = os.listdir(archive_dir)
-                archives.sort(key=lambda f: os.path.getmtime(os.path.join(archive_dir, f)))
-                for i in range(0, len(archives) - archive_count):
-                    os.remove(os.path.join(archive_dir, archives[i]))
+        return
 
     @pytest.hookimpl(hookwrapper=True)
     def pytest_terminal_summary(self, terminalreporter, exitstatus, config):
 
         yield
-        _execution_time = time.time() - terminalreporter._sessionstarttime
+        # Compute execution time using our stored session start time for compatibility with newer pytest
+        _execution_time = time.time() - ConfigVars._session_start_time
 
         if ConfigVars._execution_time < 60:
             ConfigVars._execution_time = str(round(_execution_time, 2)) + " secs"
@@ -117,19 +116,24 @@ class HTMLReporter(object):
             # generate json file
             self.generate_json_data(base)
 
-            # generate trends
-            self.update_trends(base)
-
-            # generate archive template
-            self.remove_old_archives()
-            self.update_archives_template(base) if self.archive_count != '0' else None
-
             # generate suite highlights
             generate_suite_highlights()
 
             # generate html report
             live_logs_file = open(path, 'w')
-            message = self.renew_template_text('https://i.imgur.com/LRSRHJO.png')
+            # Attempt to embed logo as data URI with fallback to the original URL
+            embedded_image = 'https://i.imgur.com/LRSRHJO.png'
+            try:
+                import base64
+                import requests
+                response = requests.get(embedded_image, timeout=5)
+                if response.status_code == 200:
+                    image_data = base64.b64encode(response.content).decode('utf-8')
+                    embedded_image = f"data:image/png;base64,{image_data}"
+            except Exception:
+                embedded_image = 'https://i.imgur.com/LRSRHJO.png'
+
+            message = self.renew_template_text(embedded_image)
             live_logs_file.write(message)
             live_logs_file.close()
 
@@ -356,10 +360,7 @@ class HTMLReporter(object):
             spass=str(ConfigVars._spass_tests),
             sfail=str(ConfigVars._suite_fail),
             sskip=str(ConfigVars._sskip_tests),
-            sxpass=str(ConfigVars._sxpass_tests),
-            sxfail=str(ConfigVars._sxfail_tests),
             serror=str(ConfigVars._suite_error),
-            srerun=str(ConfigVars._srerun_tests)
         )
 
         ConfigVars._suite_metrics_content += str(suite_row_text)
@@ -504,6 +505,8 @@ class HTMLReporter(object):
             tpass=str(ConfigVars.tpass),
             tfail=str(ConfigVars.tfail),
             tskip=str(ConfigVars.tskip),
+            duration_labels=str(ConfigVars.duration_labels),
+            duration_values=str(ConfigVars.duration_values),
             attach_screenshot_details=str(ConfigVars._attach_screenshot_details)
         )
 
@@ -565,137 +568,13 @@ class HTMLReporter(object):
             json.dump(self.json_data, outfile)
 
     def update_archives_template(self, base):
-        f = glob.glob(base + '/archive/*.json')
-        cf = glob.glob(base + '/output.json')
-        if len(f) > 0:
-            ConfigVars._archive_count = len(f) + 1
-            self.load_archive(cf, value='current')
-
-            f.sort(reverse=True)
-            self.load_archive(f, value='history')
-        else:
-            ConfigVars._archive_count = 1
-            self.load_archive(cf, value='current')
+        return
 
     def load_archive(self, f, value):
-        def state(data):
-            if data == 'fail':
-                return 'times', '#fc6766'
-            elif data == 'pass':
-                return 'check', '#98cc64'
-
-        for i, val in enumerate(f):
-            with open(val) as json_file:
-                data = json.load(json_file)
-
-                suite_highlights(data)
-                archive_row_text = ArchiveRow(astate=state(data['status'].lower())[0],
-                                              astate_color=state(data['status'].lower())[1])
-                if value == "current":
-                    archive_row_text.astatus = 'build #' + str(ConfigVars._archive_count)
-                    archive_row_textacount = str(ConfigVars._archive_count)
-                else:
-                    archive_row_text.astatus = 'build #' + str(len(f) - i)
-                    archive_row_text.acount = str(len(f) - i)
-
-                adate = datetime.strptime(
-                    data['date'].split(None, 1)[0][:1 + 2:] + ' ' +
-                    data['date'].split(None, 1)[1].replace(',', ''), "%b %d %Y"
-                )
-
-                atime = \
-                    "".join(list(filter(lambda x: ':' in x, time.ctime(float(data['start_time'])).split(' ')))).rsplit(
-                        ':',
-                        1)[0]
-                archive_row_text.adate = str(adate.date()) + ' | ' + str(time_converter(atime))
-                ConfigVars._archive_tab_content += str(archive_row_text)
-
-                _archive_body_text = ArchiveBody(
-                    total_tests=data['total_tests'],
-                    date=data['date'].upper(),
-                    _pass=data['status_list']['pass'],
-                    fail=data['status_list']['fail'],
-                    skip=data['status_list']['skip'],
-                    xpass=data['status_list']['xpass'],
-                    xfail=data['status_list']['xfail'],
-                    error=data['status_list']['error'],
-                    status=data['status'].lower()
-                )
-
-                if value == "current":
-                    _archive_body_text.iloop = str(i)
-                    _archive_body_text.acount = str(ConfigVars._archive_count)
-                else:
-                    _archive_body_text.iloop = str(i + 1)
-                    _archive_body_text.acount = str(len(f) - i)
-
-                try:
-                    _archive_body_text.rerun = data['status_list']['rerun']
-                except KeyError:
-                    _archive_body_text.rerun = '0'
-
-                index = i
-                if value != "current": index = i + 1
-                ConfigVars.archives.setdefault(str(index), {})['pass'] = data['status_list']['pass']
-                ConfigVars.archives.setdefault(str(index), {})['fail'] = data['status_list']['fail']
-                ConfigVars.archives.setdefault(str(index), {})['skip'] = data['status_list']['skip']
-                ConfigVars.archives.setdefault(str(index), {})['xpass'] = data['status_list']['xpass']
-                ConfigVars.archives.setdefault(str(index), {})['xfail'] = data['status_list']['xfail']
-                ConfigVars.archives.setdefault(str(index), {})['error'] = data['status_list']['error']
-
-                try:
-                    ConfigVars.archives.setdefault(str(index), {})['rerun'] = data['status_list']['rerun']
-                except KeyError:
-                    ConfigVars.archives.setdefault(str(index), {})['rerun'] = '0'
-
-                ConfigVars.archives.setdefault(str(index), {})['total'] = data['total_tests']
-                ConfigVars._archive_body_content += str(_archive_body_text)
+        return
 
     def update_trends(self, base):
-
-        f2 = glob.glob(base + '/output.json')
-        with open(f2[0]) as json_file:
-            data = json.load(json_file)
-            adate = datetime.strptime(
-                data['date'].split(None, 1)[0][:1 + 2:] + ' ' +
-                data['date'].split(None, 1)[1].replace(',', ''), "%b %d %Y"
-            )
-            atime = \
-                "".join(list(filter(lambda x: ':' in x, time.ctime(float(data['start_time'])).split(' ')))).rsplit(
-                    ':',
-                    1)[0]
-            ConfigVars.trends_label.append(
-                str(time_converter(atime)).upper() + ' | ' + str(adate.date().strftime("%b")) + ' '
-                + str(adate.date().strftime("%d")))
-
-            ConfigVars.tpass.append(data['status_list']['pass'])
-            ConfigVars.tfail.append(int(data['status_list']['fail']) + int(data['status_list']['error']))
-            ConfigVars.tskip.append(data['status_list']['skip'])
-
-        f = glob.glob(base + '/archive' + '/*.json')
-        f.sort(reverse=True)
-
-        for i, val in enumerate(f):
-            with open(val) as json_file:
-                data = json.load(json_file)
-
-                adate = datetime.strptime(
-                    data['date'].split(None, 1)[0][:1 + 2:] + ' ' +
-                    data['date'].split(None, 1)[1].replace(',', ''), "%b %d %Y"
-                )
-                atime = \
-                    "".join(list(filter(lambda x: ':' in x, time.ctime(float(data['start_time'])).split(' ')))).rsplit(
-                        ':',
-                        1)[0]
-                ConfigVars.trends_label.append(
-                    str(time_converter(atime)).upper() + ' | ' + str(adate.date().strftime("%b")) + ' '
-                    + str(adate.date().strftime("%d")))
-
-                ConfigVars.tpass.append(data['status_list']['pass'])
-                ConfigVars.tfail.append(int(data['status_list']['fail']) + int(data['status_list']['error']))
-                ConfigVars.tskip.append(data['status_list']['skip'])
-
-                if i == 4: break
+        return
 
     def attach_screenshots(self, screen_name, test_suite, test_case, test_error):
 
