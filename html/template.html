@@ -101,7 +101,7 @@
                     position: fixed;
                     top: 0;
                     width: 100%;
-                    background-color: #211f1f;
+                    background-color: #000000;
                     display: flex;
                     align-items: center;
                     gap: 8px;
@@ -114,6 +114,12 @@
                     color: #a2a2a2;
                     padding: 8px 12px;
                     border-right: none;
+                    display: inline-flex; /* ensure background fills the whole tab */
+                    align-items: center;
+                    gap: 6px;
+                    border-radius: 6px;
+                    height: 40px;
+                    box-sizing: border-box;
                 }
                 .topnav a:hover {
                     color: white;
@@ -181,6 +187,7 @@
                 /* Top title panel below nav */
                 .title-panel {
                     margin: 8px 12px 0 12px;
+                    text-align: center; /* center align dashboard title */
                 }
                 .title-text {
                     font-size: 1.6rem;
@@ -188,19 +195,150 @@
                     font-family: sans-serif;
                     color: dimgrey;
                     max-width: 100%;
-                    display: -webkit-box;
-                    -webkit-line-clamp: 2;
-                    -webkit-box-orient: vertical;
+                    white-space: nowrap;
                     overflow: hidden;
-                    white-space: normal;
-                    word-break: break-word;
+                    text-overflow: ellipsis;
+                    margin: 0 auto; /* ensure centered within panel */
                 }
+
+                /* Test Metrics cards */
+                .test-cards {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+                    grid-gap: 16px;
+                }
+                .test-card {
+                    border-radius: 8px;
+                    box-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+                    overflow: hidden;
+                    background: #ffffff;
+                    border: 1px solid rgba(0,0,0,0.1);
+                }
+                .test-card__header {
+                    padding: 12px 16px;
+                    color: #111;
+                    font-weight: 700;
+                    font-size: 1.4rem;
+                }
+                .test-card__body {
+                    padding: 14px 16px 18px 16px;
+                    background: #fafafa;
+                }
+                .status-label {
+                    font-weight: 800;
+                    font-size: 1.6rem;
+                    letter-spacing: 0.5px;
+                }
+                .duration-label {
+                    margin-top: 8px;
+                    font-size: 1.1rem;
+                    color: #333;
+                }
+                .suite-label {
+                    margin-bottom: 6px;
+                    font-size: 1.1rem;
+                    color: #666;
+                }
+                .test-card[data-status="PASS"] .test-card__header { background: #98cc64; }
+                .test-card[data-status="FAIL"] .test-card__header { background: #fc6766; }
+                .test-card[data-status="ERROR"] .test-card__header { background: #b13635; color: #fff; }
+                .test-card[data-status="SKIP"] .test-card__header { background: #ffd050; }
+
+                /* Simple pagination styles */
+                .tm-pagination {
+                    display: flex;
+                    gap: 8px;
+                    align-items: center;
+                    margin: 12px 0 8px 0;
+                    flex-wrap: wrap;
+                }
+                .tm-pagination .pg-btn {
+                    padding: 6px 10px;
+                    border: 1px solid #ccc;
+                    background: #fff;
+                    border-radius: 4px;
+                    cursor: pointer;
+                }
+                .tm-pagination .pg-btn.active {
+                    background: #efefef;
+                    border-color: #999;
+                    font-weight: 700;
+                }
+                .tm-pagination .pg-btn[disabled] {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
+
+                /* Suite Metrics cards */
+                .suite-cards {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+                    grid-gap: 16px;
+                }
+                .suite-card {
+                    border-radius: 8px;
+                    box-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+                    overflow: hidden;
+                    background: #ffffff;
+                    border: 1px solid rgba(0,0,0,0.1);
+                }
+                .suite-card__header {
+                    padding: 12px 16px;
+                    color: #111;
+                    font-weight: 700;
+                    font-size: 1.3rem;
+                    background: #f2f2f2;
+                }
+                .suite-card__body {
+                    padding: 14px 16px 18px 16px;
+                    background: #fafafa;
+                }
+                .suite-counts { display:flex; gap:14px; flex-wrap:wrap; }
+                .badge-count { padding:6px 10px; border-radius:6px; font-weight:700; }
+                .badge-pass { background:#e7f4dc; color:#2f6b00; }
+                .badge-fail { background:#fde0df; color:#7a1110; }
+                .badge-skip { background:#fff1cc; color:#7a5d00; }
+                .badge-error { background:#f1d9dc; color:#5e0e11; }
 
                 .header__date {
                   font-size: 1.3rem;
                   font-family: sans-serif;
                   padding-left: 5%;
                   color: darkgray;
+                }
+
+                /* Test Metrics summary */
+                .tm-summary {
+                    margin-bottom: 12px;
+                }
+                .tm-summary-title {
+                    font-size: 1.4rem;
+                    font-weight: 700;
+                    color: #333;
+                }
+                .tm-summary-top {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 6px;
+                }
+                .tm-items { color: #666; font-weight: 600; }
+                .tm-counts { display: flex; gap: 16px; flex-wrap: wrap; }
+                .tm-count { font-weight: 800; font-size: 1.2rem; }
+                .tm-count.pass { color: #98cc64; }
+                .tm-count.fail { color: #fc6766; }
+                .tm-count.skip { color: #ffd050; }
+                .tm-count.error { color: #b13635; }
+
+                /* Grouped suites in Test Metrics */
+                .suite-group { margin-bottom: 18px; }
+                .suite-group__title {
+                    font-weight: 700;
+                    font-size: 1.2rem;
+                    color: #555;
+                    margin: 10px 0 10px 0;
+                    border-left: 4px solid #4AACC5;
+                    padding-left: 8px;
                 }
 
                 .total__count {
@@ -534,6 +672,18 @@
                     color: darkgrey;
                     margin-bottom: -4%;
                 }
+                /* Insights panel */
+                .insight-section { margin-top: 12px; }
+                .insight-card { background:#fff; border:1px solid rgba(0,0,0,0.08); border-radius:8px; box-shadow: 1px 1px 4px rgba(0,0,0,0.15); margin-bottom:12px; overflow:hidden; }
+                .insight-title { padding:10px 12px; font-weight:700; font-size:1.05rem; color:#555; background:#f7f7f7; border-bottom:1px solid rgba(0,0,0,0.06); }
+                .insight-body { padding:10px 12px; }
+                .insight-row { margin:6px 0; }
+                .insight-row .label { color:#333; font-weight:600; }
+                .insight-row .value { float:right; color:#666; }
+                .mini-bar { height:8px; background:#eee; border-radius:6px; overflow:hidden; margin-top:6px; }
+                .mini-bar .fill-fail { height:100%; background:#fc6766; }
+                .mini-bar .fill-slow { height:100%; background:#4AACC5; }
+                .metric-muted { color:#888; font-size:0.9rem; }
                 .outer_my_chart {
                     margin-left: 50%;
                     margin-top: -40%;
@@ -802,14 +952,14 @@
     <body>
         <div class="loader"></div>
         <div class="topnav">
-            <img id="wrimagecard" class="wrimagecard" src="%(custom_logo)%" style="max-height:36px; width:auto;" />
+            <img id="wrimagecard" class="wrimagecard" src="%(custom_logo)%" style="max-height:56px; width:auto;" />
             <a class="tablink" href="#" id="defaultOpen" onclick="event.preventDefault(); openPage('dashboard', this, 'white', '#565656', 'groove')">
                 <i class="fa fa-home" id="tablinkicon" style="color:currentcolor;"></i> Dashboard
             </a>
-            <a class="tablink" href="#" onclick="event.preventDefault(); openPage('suiteMetrics', this, 'white', '#565656', 'groove'); executeDataTable('#sm',2)">
+            <a class="tablink" href="#" onclick="event.preventDefault(); openPage('suiteMetrics', this, 'white', '#565656', 'groove'); initSMPagination();">
                 <i class="fa fa-briefcase" id="tablinkicon" style="color:currentcolor;"></i> Suites
             </a>
-            <a class="tablink" href="#" onclick="event.preventDefault(); openPage('testMetrics', this, 'white', '#565656', 'groove'); executeDataTable('#tm',3)">
+            <a class="tablink" href="#" onclick="event.preventDefault(); openPage('testMetrics', this, 'white', '#565656', 'groove'); initTMPagination();">
                 <i class="fa fa-server" id="tablinkicon" style="color:currentcolor;"></i> Test Metrics
             </a>
             <a class="tablink" href="#" onclick="event.preventDefault(); openPage('screenshots', this, 'white', '#565656', 'groove');">
@@ -817,12 +967,12 @@
             </a>
         </div>
         <div class="main col-md-12 px-4" style="height: 100%;">
-            <div class="card title-panel">
-              <div class="card__content">
-                <div class="title-text">%(title)%</div>
-              </div>
-            </div>
             <div class="tabcontent" id="dashboard">
+                <div class="card title-panel">
+                  <div class="card__content">
+                    <div class="title-text">%(title)%</div>
+                  </div>
+                </div>
 
                 <div class="row rowcard">
                     <div class="col-md-6 card" style="max-width: 49%;">
@@ -894,34 +1044,32 @@
                 </div>
 
                 <div class="row rowcard" style="padding-top: 0.8%;">
-                    <div class="col-md-8 card border-right">
+                    <div class="col-md-6 card border-right" style="max-width: 49%;">
                         <div class="dashboard__headers">
                             <div style="font-weight: 550;font-family: sans-serif;padding-top: 5%;padding-left: 5%;">
                                 <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" width="1.34em" height="1em" style="margin-top: -1%; margin-right: 2%; padding-left: 0.9%; -ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 2048 1536"><path d="M2048 1408v128H0V0h128v1408h1920zM1664 384l256 896H256V704l448-576l576 576z" fill="#a9a9a9"/></svg> Test Suites Execution Result
-                                %(test_suite_length)%
                             </div>
                         </div>
-                        <canvas class="chart" id="groupBarChart" style="margin-top: 6%; height: 451px; width: 903px;"></canvas>
+                        <canvas class="chart" id="groupBarChart" style="margin-top: 6%; height: 451px; width: 100%;"></canvas>
                     </div>
-                    <div class="col-md-4 card border-left" style="max-width: 32.4%; padding-left: 3%; padding-top: 2%; margin-left: 0.75%;">
-                        <div class="dashboard__headers">
-                            <div style="font-weight: 550;font-family: sans-serif;padding-top: 5%;padding-left: 2%;">
-                                <i class="fa fa-bolt" style="color:currentcolor; margin-right: 2%; padding-left: 3%;"></i>
-                                Suite Highlights
-                            </div>
-                            <div>
-                                <div class="loading">
-                                    <div style="display: flow-root;">
-                                        <div class="tooltip bs-tooltip-top tooltip-dark" role="tooltip">
-                                           <div class="arrow" style="left: 50%"></div>
-                                           <div class="tooltip-inner">%(max_failure_suite_name_final)%</div>
-                                        </div>
-                                        <p class="percentage">%(max_failure_suite_count)%<sup> /%(max_failure_total_tests)%</sup> Times</p>
-                                    </div>
-                                    <div class="progress-bar downloading"></div>
-                                    <span class="suite-highlights-header">MOST FAILED SUITE</span>
+                    <div class="col-md-6" style="margin-left: 0.75%;">
+                        <div class="card">
+                            <div class="dashboard__headers">
+                                <div style="font-weight: 550;font-family: sans-serif;padding-top: 5%;padding-left: 2%;">
+                                    <i class="fa fa-exclamation-triangle" style="color:currentcolor; margin-right: 2%; padding-left: 3%;"></i>
+                                    Failure rate by suite
                                 </div>
                             </div>
+                            <div class="card__content insight-section metric-list" id="insightsFailure"></div>
+                        </div>
+                        <div class="card" style="margin-top: 0.8%;">
+                            <div class="dashboard__headers">
+                                <div style="font-weight: 550;font-family: sans-serif;padding-top: 5%;padding-left: 2%;">
+                                    <i class="fa fa-clock-o" style="color:currentcolor; margin-right: 2%; padding-left: 3%;"></i>
+                                    Slowest tests
+                                </div>
+                            </div>
+                            <div class="card__content insight-section metric-list" id="insightsSlow"></div>
                         </div>
                     </div>
                 </div>
@@ -932,45 +1080,236 @@
                     window.onload = function() {
                         alignTotalCount();
                         failureScreenshots();
-                        executeDataTable('#sm', 2);
-                        executeDataTable('#tm', 3);
+                        // executeDataTable('#tm', 3); // disabled for card layout
+                        buildInsights();
                     };
+                </script>
+                <script>
+                    // Build insights: two separate cards (failure rate, slowest tests)
+                    function buildInsights(){
+                        try{
+                            var failEl = document.getElementById('insightsFailure');
+                            var slowEl = document.getElementById('insightsSlow');
+                            var singleEl = document.getElementById('insightsContent');
+                            if(!failEl && !slowEl && !singleEl) return;
+
+                            // Collect suites table data already rendered in charts context
+                            var suiteNames = %(test_suites)% || [];
+                            var passArr = %(test_suite_pass)% || [];
+                            var failArr = %(test_suites_fail)% || [];
+                            var skipArr = %(test_suites_skip)% || [];
+                            var errorArr = %(test_suites_error)% || [];
+
+                            // Compute failure rate per suite
+                            var failureRows = [];
+                            for (var i=0;i<suiteNames.length;i++){
+                                var total = (passArr[i]||0)+(failArr[i]||0)+(skipArr[i]||0)+(errorArr[i]||0);
+                                var failures = (failArr[i]||0)+(errorArr[i]||0);
+                                var rate = total>0 ? (failures/total) : 0;
+                                failureRows.push({name: suiteNames[i], total: total, failures: failures, rate: rate});
+                            }
+                            failureRows.sort(function(a,b){ return b.rate - a.rate; });
+                            var topFailure = failureRows.slice(0,5);
+
+                            // Slowest tests from durations
+                            var durLabels = %(duration_labels)% || [];
+                            var durValues = %(duration_values)% || [];
+                            var tests = durValues.map(function(v,i){ return {name: durLabels[i], dur: v}; });
+                            tests.sort(function(a,b){ return b.dur - a.dur; });
+                            var slowTests = tests.slice(0,10);
+                            // naive 95th percentile
+                            var sortedVals = durValues.slice().sort(function(a,b){return a-b;});
+                            var p95 = sortedVals.length ? sortedVals[Math.floor(0.95*(sortedVals.length-1))] : 0;
+
+                            // Skips by reason — approximate using Test Metrics messages that include 'Skipped:'
+                            var skipReasonCounts = {};
+                            // Messages are not available here; leave placeholder if none
+
+                            var htmlFail = '';
+                            htmlFail += '<div class="insight-card">';
+                            htmlFail += '<div class="insight-title">Failure rate by suite</div>';
+                            htmlFail += '<div class="insight-body">';
+                            topFailure.forEach(function(r){
+                                var pct = Math.round(r.rate*100);
+                                htmlFail += '<div class="insight-row">'
+                                     + '<span class="label">'+r.name+'</span>'
+                                     + '<span class="value">'+r.failures+'/'+r.total+' ('+pct+'%)</span>'
+                                     + '<div class="mini-bar"><div class="fill-fail" style="width:'+pct+'%"></div></div>'
+                                     + '</div>';
+                            });
+                            htmlFail += '</div></div>';
+
+                            var htmlSlow = '';
+                            htmlSlow += '<div class="insight-card">';
+                            htmlSlow += '<div class="insight-title">Slowest tests <span class="metric-muted">(top 10, p95: '+p95+'s)</span></div>';
+                            htmlSlow += '<div class="insight-body">';
+                            var maxDur = 0; for(var i=0;i<durValues.length;i++){ if(durValues[i]>maxDur) maxDur = durValues[i]; }
+                            slowTests.forEach(function(t){
+                                var pct = maxDur ? Math.round((t.dur/maxDur)*100) : 0;
+                                htmlSlow += '<div class="insight-row">'
+                                     + '<span class="label">'+t.name+'</span>'
+                                     + '<span class="value">'+t.dur+'s</span>'
+                                     + '<div class="mini-bar"><div class="fill-slow" style="width:'+pct+'%"></div></div>'
+                                     + '</div>';
+                            });
+                            htmlSlow += '</div></div>';
+
+                            if (failEl) failEl.innerHTML = htmlFail;
+                            if (slowEl) slowEl.innerHTML = htmlSlow;
+                            if (singleEl) singleEl.innerHTML = htmlFail + htmlSlow;
+                        }catch(e){ /* no-op */ }
+                    }
+                </script>
+                <script>
+                    // Pagination logic for Test Metrics cards
+                    function initTMPagination(){
+                        var PAGE_SIZE = 20;
+                        var container = document.getElementById('tm-cards');
+                        if(!container){ return; }
+                        // group by suite from existing test cards
+                        var allCards = Array.prototype.slice.call(container.children);
+                        var groups = {};
+                        allCards.forEach(function(node){
+                            if(!node.classList || !node.classList.contains('test-card')) return; // Skip non-cards
+                            var suiteEl = node.querySelector('.suite-label');
+                            var suite = suiteEl ? suiteEl.textContent : 'suite';
+                            if(!groups[suite]) groups[suite] = [];
+                            groups[suite].push(node);
+                        });
+
+                        // rebuild DOM as suite groups each containing a grid of cards
+                        var wrapper = document.createElement('div');
+                        var suiteNames = Object.keys(groups);
+                        suiteNames.forEach(function(suite){
+                            var section = document.createElement('div');
+                            section.className = 'suite-group';
+                            var title = document.createElement('div');
+                            title.className = 'suite-group__title';
+                            title.textContent = suite;
+                            var grid = document.createElement('div');
+                            grid.className = 'test-cards';
+                            groups[suite].forEach(function(card){ grid.appendChild(card); });
+                            section.appendChild(title);
+                            section.appendChild(grid);
+                            wrapper.appendChild(section);
+                        });
+                        container.innerHTML = '';
+                        container.appendChild(wrapper);
+
+                        // pagination over all cards (flattened)
+                        var cards = suiteNames.reduce(function(acc, s){ return acc.concat(groups[s]); }, []);
+                        var total = cards.length;
+                        var totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+                        var page = 1;
+
+                        function render(){
+                            var start = (page-1) * PAGE_SIZE;
+                            var end = start + PAGE_SIZE;
+                            for (var i=0;i<cards.length;i++){
+                                cards[i].style.display = (i>=start && i<end) ? '' : 'none';
+                            }
+                            // hide empty suite sections after pagination
+                            var sections = container.querySelectorAll('.suite-group');
+                            sections.forEach(function(sec){
+                                var visible = sec.querySelectorAll('.test-card:not([style*="display: none"])').length > 0;
+                                sec.style.display = visible ? '' : 'none';
+                            });
+                            var label = document.getElementById('tm-page-label');
+                            if(label){ label.textContent = 'Page ' + page + ' of ' + totalPages; }
+                            var prev = document.getElementById('tm-prev');
+                            var next = document.getElementById('tm-next');
+                            if(prev){ prev.disabled = page<=1; }
+                            if(next){ next.disabled = page>=totalPages; }
+                        }
+
+                        var prevBtn = document.getElementById('tm-prev');
+                        var nextBtn = document.getElementById('tm-next');
+                        if(prevBtn){ prevBtn.onclick = function(){ if(page>1){ page--; render(); } }; }
+                        if(nextBtn){ nextBtn.onclick = function(){ if(page<totalPages){ page++; render(); } }; }
+
+                        render();
+                    }
+                </script>
+                <script>
+                    // Pagination logic for Suite Metrics cards
+                    function initSMPagination(){
+                        var PAGE_SIZE = 12;
+                        var container = document.getElementById('sm-cards');
+                        if(!container){ return; }
+                        var cards = Array.prototype.slice.call(container.children);
+                        var total = cards.length;
+                        var totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+                        var page = 1;
+
+                        function render(){
+                            var start = (page-1) * PAGE_SIZE;
+                            var end = start + PAGE_SIZE;
+                            for (var i=0;i<cards.length;i++){
+                                cards[i].style.display = (i>=start && i<end) ? '' : 'none';
+                            }
+                            var label = document.getElementById('sm-page-label');
+                            if(label){ label.textContent = 'Page ' + page + ' of ' + totalPages; }
+                            var items = document.getElementById('sm-items');
+                            if(items){ items.textContent = total + ' suites'; }
+                            var prev = document.getElementById('sm-prev');
+                            var next = document.getElementById('sm-next');
+                            if(prev){ prev.disabled = page<=1; }
+                            if(next){ next.disabled = page>=totalPages; }
+                        }
+
+                        var prevBtn = document.getElementById('sm-prev');
+                        var nextBtn = document.getElementById('sm-next');
+                        if(prevBtn){ prevBtn.onclick = function(){ if(page>1){ page--; render(); } }; }
+                        if(nextBtn){ nextBtn.onclick = function(){ if(page<totalPages){ page++; render(); } }; }
+
+                        render();
+                    }
                 </script>
             </div>
             <div class="tabcontent" id="suiteMetrics">
-                <table class="table row-border tablecard" id="sm">
-                    <thead>
-                        <tr>
-                            <th>Suite</th>
-                            <th>Pass</th>
-                            <th>Fail</th>
-                            <th>Skip</th>
-                            <th>Error</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        %(suite_metrics_row)%
-                    </tbody>
-                </table>
+                <div class="tm-summary">
+                    <div class="tm-summary-top">
+                        <div class="tm-summary-title">Test Summary</div>
+                        <div class="tm-items" id="sm-items">0 suites</div>
+                    </div>
+                    <div class="tm-counts">
+                        <div class="tm-count pass">%(_pass)% passed</div>
+                        <div class="tm-count fail">%(fail)% failed</div>
+                        <div class="tm-count skip">%(skip)% skipped</div>
+                        <div class="tm-count error">%(error)% error</div>
+                    </div>
+                </div>
+                <div class="tm-pagination">
+                    <button class="pg-btn" id="sm-prev">Prev</button>
+                    <div id="sm-page-label" style="margin: 0 8px;">Page 1</div>
+                    <button class="pg-btn" id="sm-next">Next</button>
+                </div>
+                <div class="suite-cards" id="sm-cards">
+                    %(suite_metrics_row)%
+                </div>
                 <div class="row">
                     <div class="col-md-12" style="height:25px;width:auto;"></div>
                 </div>
             </div>
         <div class="tabcontent" id="testMetrics">
-            <table class="table row-border tablecard" id="tm">
-                <thead>
-                    <tr>
-                        <th>Suite</th>
-                        <th>Test Case</th>
-                        <th>Status</th>
-                        <th>Time (s)</th>
-                        <th>Error Message</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    %(test_metrics_row)%
-                </tbody>
-            </table>
+            <div class="tm-summary">
+                <div class="tm-summary-top">
+                    <div class="tm-summary-title">Test Summary</div>
+                    <div class="tm-items">%(total)% items</div>
+                </div>
+                <div class="tm-counts">
+                    <div class="tm-count pass">%(_pass)% passed</div>
+                    <div class="tm-count fail">%(fail)% failed</div>
+                    <div class="tm-count skip">%(skip)% skipped</div>
+                    <div class="tm-count error">%(error)% error</div>
+                </div>
+            </div>
+            <div class="tm-pagination">
+                <button class="pg-btn" id="tm-prev">Prev</button>
+                <div id="tm-page-label" style="margin: 0 8px;">Page 1</div>
+                <button class="pg-btn" id="tm-next">Next</button>
+            </div>
+            <div id="tm-cards">%(test_metrics_row)%</div>
             <div class="row">
                 <div class="col-md-12" style="height:25px;width:auto;"></div>
             </div>
@@ -1166,12 +1505,12 @@
                 tablinks = document.getElementsByClassName("tablink");
                 for (i = 0; i < tablinks.length; i++) {
                     tablinks[i].style.color = "";
-                    tablinks[i].style.background = "";
+                    tablinks[i].style.backgroundColor = "";
                     tablinks[i].style.borderRight = "";
                 }
                 document.getElementById(pageName).style.display = "block";
                 elmnt.style.color = color;
-                elmnt.style.background = bgcolor;
+                elmnt.style.backgroundColor = bgcolor; // ensure full tab background
                 elmnt.style.borderRight = borderstyle;
             }
             // Get the element with id="defaultOpen" and click on it

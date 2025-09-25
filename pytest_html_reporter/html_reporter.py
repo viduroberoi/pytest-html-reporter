@@ -1,4 +1,5 @@
 import glob
+import base64
 import json
 import logging
 import os
@@ -111,17 +112,12 @@ class HTMLReporter(object):
 
             # generate html report
             live_logs_file = open(path, 'w')
-            # Attempt to embed logo as data URI with fallback to the original URL
-            embedded_image = 'https://i.imgur.com/LRSRHJO.png'
-            try:
-                import base64
-                import requests
-                response = requests.get(embedded_image, timeout=5)
-                if response.status_code == 200:
-                    image_data = base64.b64encode(response.content).decode('utf-8')
-                    embedded_image = f"data:image/png;base64,{image_data}"
-            except Exception:
-                embedded_image = 'https://i.imgur.com/LRSRHJO.png'
+            assets_b64 = os.path.join(os.path.dirname(__file__), 'assets', 'logo_base64')
+            if os.path.exists(assets_b64):
+                with open(assets_b64, 'r') as _f:
+                    image_data = _f.read().strip()
+                    if image_data:
+                        embedded_image = f"data:image/png;base64,{image_data}"
 
             message = self.renew_template_text(embedded_image)
             live_logs_file.write(message)

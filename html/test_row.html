@@ -1,10 +1,12 @@
-<tr>
-    <td style="word-wrap: break-word;max-width: 200px; white-space: normal; text-align:left">%(sname)%</td>
-    <td style="word-wrap: break-word;max-width: 200px; white-space: normal; text-align:left">%(name)%</td>
-    <td>%(stat)%</td>
-    <td>%(dur)%</td>
-    <td style="word-wrap: break-word;max-width: 200px; white-space: normal; text-align:left">
-        %(msg)%
-        %(floating_error_text)%
-    </td>
-</tr>
+<div class="test-card" data-status="%(stat)%">
+  <div class="test-card__header">%(name)%</div>
+  <div class="test-card__body">
+    <div class="suite-label">%(sname)%</div>
+    <div class="status-label">%(stat)%</div>
+    <div class="duration-label">%(dur)%s</div>
+    <div style="word-wrap: break-word;white-space: normal; text-align:left">
+      %(msg)%
+      %(floating_error_text)%
+    </div>
+  </div>
+</div>

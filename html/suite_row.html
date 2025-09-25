@@ -1,7 +1,11 @@
-<tr>
-    <td style="word-wrap: break-word;max-width: 200px; white-space: normal; text-align:left">%(sname)%</td>
-    <td>%(spass)%</td>
-    <td>%(sfail)%</td>
-    <td>%(sskip)%</td>
-    <td>%(serror)%</td>
-</tr>
+<div class="suite-card">
+  <div class="suite-card__header">%(sname)%</div>
+  <div class="suite-card__body">
+    <div class="suite-counts">
+      <span class="badge-count badge-pass">Pass: %(spass)%</span>
+      <span class="badge-count badge-fail">Fail: %(sfail)%</span>
+      <span class="badge-count badge-skip">Skip: %(sskip)%</span>
+      <span class="badge-count badge-error">Error: %(serror)%</span>
+    </div>
+  </div>
+  </div>
